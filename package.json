@@ -2,7 +2,12 @@
   "name": "@pixeloven/book",
   "author": "Brian Gebel <brian@pixeloven.com>",
   "description": "Framework for build Client and Server JavaScript applications",
-  "private": true,
+  "main": "dist/lib/index.js",
+  "types": "dist/types/types.d.ts",
+  "files": [
+    "dist/"
+  ],
+  "homepage": "https://www.pixeloven.com",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/pixeloven/book.git"
@@ -12,20 +17,65 @@
     "node": ">=8.0.0",
     "yarn": ">=1.0.0"
   },
-  "workspaces": [
-    "apps/**/*",
-    "packages/**/*"
-  ],
+  "dependencies": {
+    "@evocateur/npm-registry-fetch": "4.0.0",
+    "aproba": "2.0.0",
+    "figgy-pudding": "3.5.1",
+    "get-stream": "4.0.0",
+    "lodash.clonedeep": "4.5.0",
+    "normalize-package-data": "2.4.0",
+    "npm-package-arg": "6.1.0",
+    "semver": "5.5.1",
+    "ssri": "6.0.1"
+  },
   "devDependencies": {
     "@commitlint/cli": "8.3.5",
     "@commitlint/config-conventional": "8.3.4",
     "codecov": "3.6.1",
-    "husky": "4.0.10"
+    "husky": "4.0.10",
+    "lint-staged": "9.5.0",
+    "prettier": "1.19.1",
+    "tslint": "5.20.1",
+    "tslint-config-prettier": "1.18.0",
+    "tslint-eslint-rules": "5.4.0",
+    "typescript": "3.7.5",
+    "bluebird": "^3.5.1",
+    "nock": "^9.6.1",
+    "standard-version": "*",
+    "tap": "*",
+    "tar-stream": "^1.6.1"
+  },
+  "scripts": {
+    "prerelease": "npm t",
+    "release": "standard-version -s",
+    "postrelease": "npm publish && git push --follow-tags",
+    "pretest": "standard",
+    "old:test": "tap -J --100 test/*.js",
+    "woot": "",
+    "compile": "tsc --pretty --project tsconfig.json",
+    "compile:watch": "tsc --pretty --project tsconfig.json --watch",
+    "lint": "tslint -t codeFrame --config tslint.json src/**/*.ts",
+    "pretty": "prettier --write --config prettier.json src/**/*.ts",
+    "test": "jest --config jest.json --color --coverage",
+    "test:ci": "jest --config jest.json --ci --coverage",
+    "test:watch": "jest --config jest.json --color --watch"
   },
   "husky": {
     "hooks": {
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
-      "pre-commit": "exit 0"
+      "pre-commit": "lint-staged"
     }
+  },
+  "lint-staged": {
+    "src/**/*.{scss}": [
+      "yarn pixeloven pretty scss",
+      "yarn pixeloven lint scss",
+      "git add"
+    ],
+    "src/**/*.{ts,tsx}": [
+      "yarn pixeloven pretty ts",
+      "yarn pixeloven lint ts",
+      "git add"
+    ]
   }
 }
