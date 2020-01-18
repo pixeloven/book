@@ -67,14 +67,8 @@
     }
   },
   "lint-staged": {
-    "src/**/*.{scss}": [
-      "yarn pixeloven pretty scss",
-      "yarn pixeloven lint scss",
-      "git add"
-    ],
-    "src/**/*.{ts,tsx}": [
-      "yarn pixeloven pretty ts",
-      "yarn pixeloven lint ts",
+    "src/**/*.ts": [
+      "prettier --write --config prettier.json",
       "git add"
     ]
   }
