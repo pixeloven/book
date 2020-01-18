@@ -1,0 +1,31 @@
+{
+  "name": "@pixeloven/book",
+  "author": "Brian Gebel <brian@pixeloven.com>",
+  "description": "Framework for build Client and Server JavaScript applications",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pixeloven/book.git"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=8.0.0",
+    "yarn": ">=1.0.0"
+  },
+  "workspaces": [
+    "apps/**/*",
+    "packages/**/*"
+  ],
+  "devDependencies": {
+    "@commitlint/cli": "8.3.5",
+    "@commitlint/config-conventional": "8.3.4",
+    "codecov": "3.6.1",
+    "husky": "4.0.10"
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+      "pre-commit": "exit 0"
+    }
+  }
+}
