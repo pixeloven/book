@@ -5,6 +5,7 @@
 # Misc system files
 .cache
 .DS_Store
+.nyc_output
 
 # Transient root directories
 .cache
@@ -29,13 +30,5 @@ yarn-error.log*
 __snapshots__
 
 # Build files
-**/coverage
-**/dist
-**/build
-**/node_modules
-**/stats
-**/stories
-
-# generated files
-.docusaurus
-.cache-loader
+dist
+node_modules
