@@ -1,29 +1,29 @@
+/* tslint:disable no-string-literal */
 "use strict";
 
-const cloneDeep = require("lodash.clonedeep");
-const figgyPudding = require("figgy-pudding");
-const { fixer } = require("normalize-package-data");
-const getStream = require("get-stream");
-const npa = require("npm-package-arg");
-const npmAuth = require("@evocateur/npm-registry-fetch/auth.js");
-const npmFetch = require("@evocateur/npm-registry-fetch");
-const semver = require("semver");
-const ssri = require("ssri");
-const url = require("url");
-const validate = require("aproba");
+import npmFetch from "@evocateur/npm-registry-fetch";
+import npmAuth from "@evocateur/npm-registry-fetch/auth.js";
+import validate from "aproba";
+import figgyPudding from "figgy-pudding";
+import getStream from "get-stream";
+import cloneDeep from "lodash.clonedeep";
+import { fixer } from "normalize-package-data";
+import npa from "npm-package-arg";
+import semver from "semver";
+import ssri from "ssri";
+import url from "url";
 
 const PublishConfig = figgyPudding({
     access: {},
     algorithms: { default: ["sha512"] },
     npmVersion: {},
+    promise: { default: () => Promise },
     tag: { default: "latest" },
-    Promise: { default: () => Promise },
 });
 
-module.exports = publish;
-function publish(manifest, tarball, opts) {
+function publish(manifest: any, tarball: any, opts: any) {
     opts = PublishConfig(opts);
-    return new opts.Promise(resolve => resolve())
+    return new opts.promise((resolve: any) => resolve())
         .then(() => {
             validate("OSO|OOO", [manifest, tarball, opts]);
             if (manifest.private) {
@@ -51,7 +51,7 @@ function publish(manifest, tarball, opts) {
                 );
             }
 
-            return slurpTarball(tarball, opts).then(tardata => {
+            return slurpTarball(tarball, opts).then((tardata: any) => {
                 const metadata = buildMetadata(
                     spec,
                     auth,
@@ -63,11 +63,11 @@ function publish(manifest, tarball, opts) {
                 return npmFetch(
                     spec.escapedName,
                     opts.concat({
-                        method: "PUT",
                         body: metadata,
                         ignoreBody: true,
+                        method: "PUT",
                     }),
-                ).catch(err => {
+                ).catch((err: any) => {
                     if (err.code !== "E409") {
                         throw err;
                     }
@@ -78,14 +78,16 @@ function publish(manifest, tarball, opts) {
                                 query: { write: true },
                             }),
                         )
-                        .then(current => patchMetadata(current, metadata, opts))
-                        .then(newMetadata => {
+                        .then((current: any) =>
+                            patchMetadata(current, metadata, opts),
+                        )
+                        .then((newMetadata: any) => {
                             return npmFetch(
                                 spec.escapedName,
                                 opts.concat({
-                                    method: "PUT",
                                     body: newMetadata,
                                     ignoreBody: true,
+                                    method: "PUT",
                                 }),
                             );
                         });
@@ -95,7 +97,7 @@ function publish(manifest, tarball, opts) {
         .then(() => true);
 }
 
-function patchedManifest(spec, auth, base, opts) {
+function patchedManifest(spec: any, auth: any, base: any, opts: any) {
     const manifest = cloneDeep(base);
     manifest._nodeVersion = process.versions.node;
     if (opts.npmVersion) {
@@ -110,12 +112,15 @@ function patchedManifest(spec, auth, base, opts) {
         // currently gets filled in by the npm registry itself, based on auth
         // information.
         manifest._npmUser = {
-            name: auth.username,
             email: auth.email,
+            name: auth.username,
         };
     }
 
-    fixer.fixNameField(manifest, { strict: true, allowLegacyCase: true });
+    fixer.fixNameField(manifest, {
+        allowLegacyCase: true,
+        strict: true,
+    });
     const version = semver.clean(manifest.version);
     if (!version) {
         throw Object.assign(new Error("invalid semver: " + manifest.version), {
@@ -126,17 +131,29 @@ function patchedManifest(spec, auth, base, opts) {
     return manifest;
 }
 
-function buildMetadata(spec, auth, registry, manifest, tardata, opts) {
+function buildMetadata(
+    spec: any,
+    auth: any,
+    registry: any,
+    manifest: any,
+    tardata: any,
+    opts: any,
+) {
     const root = {
+        _attachments: {},
         _id: manifest.name,
-        name: manifest.name,
+        access: "",
         description: manifest.description,
         "dist-tags": {},
-        versions: {},
+        maintainers: [] as any[],
+        name: manifest.name,
         readme: manifest.readme || "",
+        versions: {},
     };
 
-    if (opts.access) root.access = opts.access;
+    if (opts.access) {
+        root.access = opts.access;
+    }
 
     if (!auth.token) {
         root.maintainers = [{ name: auth.username, email: auth.email }];
@@ -158,13 +175,13 @@ function buildMetadata(spec, auth, registry, manifest, tardata, opts) {
     // Don't bother having sha1 in the actual integrity field
     manifest.dist.integrity = integrity["sha512"][0].toString();
     // Legacy shasum support
+    // @ts-ignore
     manifest.dist.shasum = integrity["sha1"][0].hexDigest();
     // eslint-disable-next-line node/no-deprecated-api
     manifest.dist.tarball = url
         .resolve(registry, tbURI)
         .replace(/^https:\/\//, "http://");
 
-    root._attachments = {};
     root._attachments[tbName] = {
         content_type: "application/octet-stream",
         data: tardata.toString("base64"),
@@ -174,7 +191,7 @@ function buildMetadata(spec, auth, registry, manifest, tardata, opts) {
     return root;
 }
 
-function patchMetadata(current, newData, opts) {
+function patchMetadata(current: any, newData: any, opts: any) {
     const curVers = Object.keys(current.versions || {})
         .map(v => {
             return semver.clean(v, true);
@@ -184,6 +201,7 @@ function patchMetadata(current, newData, opts) {
                 if (semver.valid(v, true)) {
                     return semver.clean(v, true);
                 }
+                return null;
             }),
         )
         .filter(v => v);
@@ -196,25 +214,29 @@ function patchMetadata(current, newData, opts) {
 
     current.versions = current.versions || {};
     current.versions[newVersion] = newData.versions[newVersion];
-    for (var i in newData) {
-        switch (i) {
-            // objects that copy over the new stuffs
-            case "dist-tags":
-            case "versions":
-            case "_attachments":
-                for (var j in newData[i]) {
-                    current[i] = current[i] || {};
-                    current[i][j] = newData[i][j];
-                }
-                break;
+    for (const i in newData) {
+        if (newData[i]) {
+            switch (i) {
+                // objects that copy over the new stuffs
+                case "dist-tags":
+                case "versions":
+                case "_attachments":
+                    for (const j in newData[i]) {
+                        if (newData[i][j]) {
+                            current[i] = current[i] || {};
+                            current[i][j] = newData[i][j];
+                        }
+                    }
+                    break;
 
-            // ignore these
-            case "maintainers":
-                break;
+                // ignore these
+                case "maintainers":
+                    break;
 
-            // copy
-            default:
-                current[i] = newData[i];
+                // copy
+                default:
+                    current[i] = newData[i];
+            }
         }
     }
     const maint =
@@ -223,15 +245,15 @@ function patchMetadata(current, newData, opts) {
     return current;
 }
 
-function slurpTarball(tarSrc, opts) {
+function slurpTarball(tarSrc: any, opts: any) {
     if (Buffer.isBuffer(tarSrc)) {
-        return opts.Promise.resolve(tarSrc);
+        return opts.promise.resolve(tarSrc);
     } else if (typeof tarSrc === "string") {
-        return opts.Promise.resolve(Buffer.from(tarSrc, "base64"));
+        return opts.promise.resolve(Buffer.from(tarSrc, "base64"));
     } else if (typeof tarSrc.pipe === "function") {
         return getStream.buffer(tarSrc);
     } else {
-        return opts.Promise.reject(
+        return opts.promise.reject(
             Object.assign(
                 new Error(
                     "invalid tarball argument. Must be a Buffer, a base64 string, or a binary stream",
@@ -244,7 +266,7 @@ function slurpTarball(tarSrc, opts) {
     }
 }
 
-function ConflictError(pkgid, version) {
+function ConflictError(pkgid: string, version: string) {
     return Object.assign(
         new Error(`Cannot publish ${pkgid}@${version} over existing version.`),
         {
@@ -254,3 +276,5 @@ function ConflictError(pkgid, version) {
         },
     );
 }
+
+module.exports = publish;

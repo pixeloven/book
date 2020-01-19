@@ -1,20 +1,19 @@
 "use strict";
 
-const figgyPudding = require("figgy-pudding");
-const npa = require("npm-package-arg");
-const npmFetch = require("@evocateur/npm-registry-fetch");
-const semver = require("semver");
-const url = require("url");
+import npmFetch from "@evocateur/npm-registry-fetch";
+import figgyPudding from "figgy-pudding";
+import npa from "npm-package-arg";
+import semver from "semver";
+import url from "url";
 
 const UnpublishConfig = figgyPudding({
     force: { default: false },
-    Promise: { default: () => Promise },
+    promise: { default: () => Promise },
 });
 
-module.exports = unpublish;
-function unpublish(spec, opts) {
+function unpublish(spec: any, opts: any) {
     opts = UnpublishConfig(opts);
-    return new opts.Promise(resolve => resolve())
+    return new opts.promise((resolve: any) => resolve())
         .then(() => {
             spec = npa(spec);
             // NOTE: spec is used to pick the appropriate registry/auth combo.
@@ -28,20 +27,20 @@ function unpublish(spec, opts) {
                     }),
                 )
                 .then(
-                    pkg => {
+                    (pkg: any) => {
                         if (!spec.rawSpec || spec.rawSpec === "*") {
                             return npmFetch(
                                 `${pkgUri}/-rev/${pkg._rev}`,
                                 opts.concat({
-                                    method: "DELETE",
                                     ignoreBody: true,
+                                    method: "DELETE",
                                 }),
                             );
                         } else {
                             const version = spec.rawSpec;
                             const allVersions = pkg.versions || {};
                             const versionPublic = allVersions[version];
-                            let dist;
+                            let dist: any;
                             if (versionPublic) {
                                 dist = allVersions[version].dist;
                             }
@@ -51,8 +50,8 @@ function unpublish(spec, opts) {
                                 return npmFetch(
                                     `${pkgUri}/-rev/${pkg._rev}`,
                                     opts.concat({
-                                        method: "DELETE",
                                         ignoreBody: true,
+                                        method: "DELETE",
                                     }),
                                 );
                             } else if (versionPublic) {
@@ -67,6 +66,7 @@ function unpublish(spec, opts) {
                                     pkg["dist-tags"].latest = Object.keys(
                                         allVersions,
                                     )
+                                        // @ts-ignore
                                         .sort(semver.compareLoose)
                                         .pop();
                                 }
@@ -77,9 +77,9 @@ function unpublish(spec, opts) {
                                 return npmFetch(
                                     `${pkgUri}/-rev/${pkg._rev}`,
                                     opts.concat({
-                                        method: "PUT",
                                         body: pkg,
                                         ignoreBody: true,
+                                        method: "PUT",
                                     }),
                                 ).then(() => {
                                     // Remove the tarball itself
@@ -90,16 +90,19 @@ function unpublish(spec, opts) {
                                                 query: { write: true },
                                             }),
                                         )
-                                        .then(({ _rev, _id }) => {
+                                        .then((f: any) => {
                                             // eslint-disable-next-line node/no-deprecated-api
-                                            const tarballUrl = url
-                                                .parse(dist.tarball)
-                                                .pathname.substr(1);
+                                            const tarballPathName = url.parse(
+                                                dist.tarball,
+                                            ).pathname;
+                                            const tarballUrl = tarballPathName
+                                                ? tarballPathName.substr(1)
+                                                : "";
                                             return npmFetch(
-                                                `${tarballUrl}/-rev/${_rev}`,
+                                                `${tarballUrl}/-rev/${f._rev}`,
                                                 opts.concat({
-                                                    method: "DELETE",
                                                     ignoreBody: true,
+                                                    method: "DELETE",
                                                 }),
                                             );
                                         });
@@ -107,7 +110,7 @@ function unpublish(spec, opts) {
                             }
                         }
                     },
-                    err => {
+                    (err: any) => {
                         if (err.code !== "E404") {
                             throw err;
                         }
@@ -116,3 +119,5 @@ function unpublish(spec, opts) {
         })
         .then(() => true);
 }
+
+module.exports = unpublish;

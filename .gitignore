@@ -30,5 +30,6 @@ yarn-error.log*
 __snapshots__
 
 # Build files
+coverage
 dist
 node_modules

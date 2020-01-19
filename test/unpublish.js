@@ -10,7 +10,7 @@ const OPTS = figgyPudding({ registry: {} })({
 
 const REG = OPTS.registry
 const REV = '72-47f2986bfd8e8b55068b204588bbf484'
-const unpub = require('../src/unpublish.js')
+const unpub = require('../dist/lib/unpublish.js')
 
 test('basic test', t => {
   const doc = {

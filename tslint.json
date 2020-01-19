@@ -19,7 +19,7 @@
     "no-implicit-dependencies": false,
     "no-submodule-imports": false,
     "no-console": false,
-    "no-any": true,
-    "no-null-keyword": true
+    "no-any": false,
+    "no-null-keyword": false
   }
 }

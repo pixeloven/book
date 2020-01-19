@@ -9,7 +9,7 @@ const ssri = require('ssri')
 const { test } = require('tap')
 const tnock = require('./util/tnock.js')
 
-const publish = require('../src/publish.js')
+const publish = require('../dist/lib/publish.js')
 
 const OPTS = figgyPudding({ registry: {} })({
   registry: 'https://mock.reg/'
@@ -30,7 +30,9 @@ test('basic publish', t => {
     const shasum = crypto.createHash('sha1').update(tarData).digest('hex')
     const integrity = ssri.fromData(tarData, { algorithms: ['sha512'] })
     const packument = {
+      access: "",
       name: 'libnpmpublish',
+      maintainers: [],
       description: 'some stuff',
       readme: '',
       _id: 'libnpmpublish',
@@ -88,7 +90,9 @@ test('scoped publish', t => {
     const shasum = crypto.createHash('sha1').update(tarData).digest('hex')
     const integrity = ssri.fromData(tarData, { algorithms: ['sha512'] })
     const packument = {
+      access: "",
       name: '@zkat/libnpmpublish',
+      maintainers: [],
       description: 'some stuff',
       readme: '',
       _id: '@zkat/libnpmpublish',
@@ -149,6 +153,7 @@ test('retry after a conflict', t => {
     const shasum = crypto.createHash('sha1').update(tarData).digest('hex')
     const integrity = ssri.fromData(tarData, { algorithms: ['sha512'] })
     const basePackument = {
+      access: "",
       name: 'libnpmpublish',
       description: 'some stuff',
       readme: '',
@@ -265,6 +270,7 @@ test('retry after a conflict -- no versions on remote', t => {
     const shasum = crypto.createHash('sha1').update(tarData).digest('hex')
     const integrity = ssri.fromData(tarData, { algorithms: ['sha512'] })
     const basePackument = {
+      access: "",
       name: 'libnpmpublish',
       description: 'some stuff',
       readme: '',
@@ -348,7 +354,9 @@ test('version conflict', t => {
     const shasum = crypto.createHash('sha1').update(tarData).digest('hex')
     const integrity = ssri.fromData(tarData, { algorithms: ['sha512'] })
     const basePackument = {
+      access: "",
       name: 'libnpmpublish',
+      maintainers: [],
       description: 'some stuff',
       readme: '',
       _id: 'libnpmpublish',
@@ -415,6 +423,7 @@ test('publish with basic auth', t => {
     const shasum = crypto.createHash('sha1').update(tarData).digest('hex')
     const integrity = ssri.fromData(tarData, { algorithms: ['sha512'] })
     const packument = {
+      access: "",
       name: 'libnpmpublish',
       description: 'some stuff',
       readme: '',
@@ -488,7 +497,9 @@ test('publish base64 string', t => {
     const shasum = crypto.createHash('sha1').update(tarData).digest('hex')
     const integrity = ssri.fromData(tarData, { algorithms: ['sha512'] })
     const packument = {
+      access: "",
       name: 'libnpmpublish',
+      maintainers: [],
       description: 'some stuff',
       readme: '',
       _id: 'libnpmpublish',
@@ -548,7 +559,9 @@ test('publish tar stream', t => {
     const shasum = crypto.createHash('sha1').update(tarData).digest('hex')
     const integrity = ssri.fromData(tarData, { algorithms: ['sha512'] })
     const packument = {
+      access: "",
       name: 'libnpmpublish',
+      maintainers: [],
       description: 'some stuff',
       readme: '',
       _id: 'libnpmpublish',
@@ -641,6 +654,7 @@ test('publish includes access', t => {
       'dist-tags': {
         latest: '1.0.0'
       },
+      maintainers: [],
       versions: {
         '1.0.0': {
           _id: 'libnpmpublish@1.0.0',
@@ -746,7 +760,9 @@ test('other error code', t => {
     const shasum = crypto.createHash('sha1').update(tarData).digest('hex')
     const integrity = ssri.fromData(tarData, { algorithms: ['sha512'] })
     const packument = {
+      access: "",
       name: 'libnpmpublish',
+      maintainers: [],
       description: 'some stuff',
       readme: '',
       _id: 'libnpmpublish',
@@ -813,6 +829,7 @@ test('publish includes access', t => {
       description: 'some stuff',
       readme: '',
       access: 'public',
+      maintainers: [],
       _id: 'libnpmpublish',
       'dist-tags': {
         latest: '1.0.0'
@@ -839,7 +856,7 @@ test('publish includes access', t => {
         }
       }
     }
-    const srv = tnock(t, REG)
+    const srv = tnock(t, REG);
     srv.put('/libnpmpublish', body => {
       t.deepEqual(body, packument, 'posted packument matches expectations')
       return true
@@ -872,7 +889,9 @@ test('publishConfig on manifest', t => {
     const shasum = crypto.createHash('sha1').update(tarData).digest('hex')
     const integrity = ssri.fromData(tarData, { algorithms: ['sha512'] })
     const packument = {
+      access: "",
       name: 'libnpmpublish',
+      maintainers: [],
       description: 'some stuff',
       readme: '',
       _id: 'libnpmpublish',
@@ -931,7 +950,9 @@ test('publish with encoded _auth', t => {
     const shasum = crypto.createHash('sha1').update(tarData).digest('hex')
     const integrity = ssri.fromData(tarData, { algorithms: ['sha512'] })
     const packument = {
+      access: "",
       name: 'libnpmpublish',
+      maintainers: [],
       description: 'some stuff',
       readme: '',
       _id: 'libnpmpublish',
@@ -1001,7 +1022,9 @@ test('publish with 302 redirect', t => {
     const integrity = ssri.fromData(tarData, { algorithms: ['sha512'] })
     const packument = {
       name: 'libnpmpublish',
+      maintainers: [],
       description: 'some stuff',
+      access: '',
       readme: '',
       _id: 'libnpmpublish',
       'dist-tags': {
