@@ -1,4 +1,2 @@
-module.exports = {
-    publish: require("./publish.js"),
-    unpublish: require("./unpublish.js"),
-};
+export { default as publish } from "./publish";
+export { default as unpublish } from "./unpublish";

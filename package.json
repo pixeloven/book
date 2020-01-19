@@ -31,6 +31,10 @@
   "devDependencies": {
     "@commitlint/cli": "8.3.5",
     "@commitlint/config-conventional": "8.3.4",
+    "@types/npm-package-arg": "6.1.0",
+    "@types/semver": "6.2.0",
+    "@types/lodash.clonedeep": "4.5.6",
+    "@types/ssri": "6.0.1",
     "codecov": "3.6.1",
     "husky": "4.0.10",
     "lint-staged": "9.5.0",
@@ -69,6 +73,7 @@
   "lint-staged": {
     "src/**/*.ts": [
       "prettier --write --config prettier.json",
+      "tslint -t codeFrame --config tslint.json",
       "git add"
     ]
   }
